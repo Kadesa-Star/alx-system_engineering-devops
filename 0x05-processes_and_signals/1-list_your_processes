@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 #Display a list of currently running processes and hierachy
-ps -eo user,pid,ppid,cmd
+
+echo "USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND"
+echo "-----------------------------------------------------------------------"
+
+# Display all processes in a user-oriented format
+ps -eo user,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,cmd --sort=user
+echo
+echo "Process Hierarchy:"
+echo "-----------------------------"
 ps -eH
