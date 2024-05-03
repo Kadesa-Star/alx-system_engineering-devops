@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 #Display a list of currently running processes and hierachy
 
-ps -eo user,pid,ppid,cmd --sort=user
+ps -eo user,pid,ppid,cmd
 ps -eH
