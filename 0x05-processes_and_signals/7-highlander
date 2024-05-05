@@ -3,13 +3,8 @@
 #print "i am invincible!!!" when receiving a SIGTERM signal
 
 #Function to handle SIGTERM signal
-terminate() {
-	echo "I am invincible!!!"
-	exit
-}
 #trap SIGTERM signal
-trap terminate SIGTERM
-
+trap 'echo "I am invincible!!!"; exit' SIGTERM
 #Infinite loop
 while true; do
 	echo "To infinity and beyond"
