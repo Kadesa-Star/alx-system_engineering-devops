@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#kills the 7 highlander
+
+p_pid=$(pgrep -f ./7-highlander)
+
+#check if pid is valid
+if [ -n "$p_pid" ]; then
+	#send a termination signal to the process
+	kill "$p_pid"
+fi
