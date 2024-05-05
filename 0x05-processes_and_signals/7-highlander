@@ -4,7 +4,7 @@
 
 #Function to handle SIGTERM signal
 #trap SIGTERM signal
-trap 'echo "I am invincible!!!"; exit' SIGTERM
+trap 'echo "I am invincible!!!"' 15
 #Infinite loop
 while true; do
 	echo "To infinity and beyond"
