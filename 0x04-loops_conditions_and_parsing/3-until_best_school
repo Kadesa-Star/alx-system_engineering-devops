@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#using until to repeat best school 10 times
+
+#initialize count
+count=0
+
+until [ $count -ge 10 ]; do
+	echo "Best School"
+	((count++))
+done
