@@ -7,7 +7,5 @@ passwd_file="/etc/passwd"
 # Read the passwd file line by line using a while loop
 while IFS=: read -r username password uid gid info home shell; do
     # Print username, user id, and home directory path
-    echo "Username: $username"
-    echo "User ID: $uid"
-    echo "Home Directory: $home"
+    echo "$username:$uid:$home"
 done < "$passwd_file"
