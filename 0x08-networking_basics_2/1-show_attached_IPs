@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Get all active IPv4 IPs
+ipv4_ips=$(ip -o -4 addr show | awk '{print $4}')
+
+# Print the IPs
+echo "Active IPv4 IPs:"
+echo "$ipv4_ips"
