@@ -2,33 +2,4 @@
 
 # Display listening ports with PID and program name
 
-# Get listening sockets
-listening_sockets=$(netstat -tuln)
-
-# Print header
-printf "%-15s %-15s %-20s\n" "Port" "PID" "Program Name"
-echo "--------------------------------------------"
-
-# Loop through each listening socket
-while IFS= read -r line; do
-    # Check if the line contains "LISTEN"
-    if [[ $line == *LISTEN* ]]; then
-        # Extract port number
-        port=$(echo "$line" | awk '{print $4}' | awk -F ':' '{print $NF}')
-        
-        # Extract PID
-        pid=$(echo "$line" | awk '{print $NF}' | awk -F '/' '{print $1}')
-
-        # Get program name associated with PID
-        program=$(ps -p "$pid" -o comm= 2>/dev/null)
-
-        # Check if program name is empty
-        if [ -z "$program" ]; then
-            program="Unknown"
-        fi
-
-        # Print port, PID, and program name
-        printf "%-15s %-15s %-20s\n" "$port" "$pid" "$program"
-    fi
-done <<< "$listening_sockets"
-
+netstat -l -p 
