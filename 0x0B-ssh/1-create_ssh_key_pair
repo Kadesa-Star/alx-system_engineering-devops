@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# This script creates an RSA key pair with a specified name, number of bits, and passphrase
+# This script creates an RSA key pair with a specified name number of bits, and passphrase
 
 # Define variables
 KEY_NAME="school"
