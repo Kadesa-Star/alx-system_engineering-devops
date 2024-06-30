@@ -1,4 +1,5 @@
-# Puppet script to configure SSH client settings in /etc/ssh/ssh_config
+# Puppet script to create ssh config file
+include stdlib
 
 file_line { 'Turn off passwd auth and declare identity file':
   ensure => 'present',
