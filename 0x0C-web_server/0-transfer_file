@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+
+# check if correct number of parameters are provided
+if [ "$#" -lt 4 ]; then
+	echo "Usage: 0-transfer_file PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
+       exit 1
+fi
+
+# parameters
+PATH_TO_FILE="$1"
+IP="$2"
+USERNAME="$3"
+PATH_TO_SSH_KEY="$4"
+
+# check if file exists
+if [ ! -f "$PATH_TO_FILE" ]; then
+	echo "File '$PATH_TO_FILE' not found."
+	exit 1
+fi
+
+# Transfer file using scp with SSH private key
+# And disable strict host key checking
+scp -o StrictHostKeyChecking=no -i "$PATH_TO_SSH_KEY" "$PATH_TO_FILE" "$USERNAME@$IP":~/
+
+# check scp exit status
+if ! scp -o StrictHostKeyChecking=no -i "$PATH_TO_SSH_KEY" "$PATH_TO_FILE" "$USERNAME@$IP":~/; then	
+	echo "Error: File transfer failed."
+	exit 1
+fi
+
+echod "File '$PATH_TO_FILE' transferred successfully to $USERNAME@$IP:~/"
