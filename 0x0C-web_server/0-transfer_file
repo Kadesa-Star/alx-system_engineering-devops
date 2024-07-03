@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
+# Script to transfer a file using SCP to a remote server
 
+# Function to display usage information
+display_usage() {
+    echo "Usage: $0 PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
+    exit 1
+}
 
-# check if correct number of parameters are provided
-if [ "$#" -lt 4 ]; then
-	echo "Usage: 0-transfer_file PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
-       exit 1
+# Check if number of arguments is less than 4, display usage
+if [ $# -lt 4 ]; then
+    display_usage
 fi
 
-# parameters
-PATH_TO_FILE="$1"
-IP="$2"
-USERNAME="$3"
-PATH_TO_SSH_KEY="$4"
+# Assigning arguments to variables
+PATH_TO_FILE=$1
+IP=$2
+USERNAME=$3
+PATH_TO_SSH_KEY=$4
 
-# check if file exists
+# Checking if the file exists
 if [ ! -f "$PATH_TO_FILE" ]; then
-	echo "File '$PATH_TO_FILE' not found."
-	exit 1
+    echo "Error: File $PATH_TO_FILE does not exist."
+    display_usage
 fi
 
-# Transfer file using scp with SSH private key
-# And disable strict host key checking
-scp -o StrictHostKeyChecking=no -i "$PATH_TO_SSH_KEY" "$PATH_TO_FILE" "$USERNAME@$IP":~/
-
-# check scp exit status
-if ! scp -o StrictHostKeyChecking=no -i "$PATH_TO_SSH_KEY" "$PATH_TO_FILE" "$USERNAME@$IP":~/; then	
-	echo "Error: File transfer failed."
-	exit 1
+# Using SCP to transfer the file to remote server's home directory
+if scp -i "$PATH_TO_SSH_KEY" -o StrictHostKeyChecking=no "$PATH_TO_FILE" "$USERNAME@$IP":~/; then
+    echo "File transfer successful!"
+else
+    echo "File transfer failed!"
 fi
-
-echod "File '$PATH_TO_FILE' transferred successfully to $USERNAME@$IP:~/"
