@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Fix Apache server to return "Hello Holberton" on port 80
+
+# Update package list and install Apache and curl
+apt-get update
+apt-get install -y apache2 curl
+
+# Create the index.html file with the required content
+echo "Hello Holberton" > /var/www/html/index.html
+
+# Ensure Apache is enabled and start the Apache service
+service apache2 start
