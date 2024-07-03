@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
-# Installs Nginx
 
-# Update package lists to ensure we install the latest versions
+# Update package list
 apt-get update
 
-# Install Nginx with the '-y' flag to automatically answer yes to prompts
+# Install Nginx
 apt-get install -y nginx
 
-# Echo "Holberton School" into /var/www/html/index.html to create a basic index page
-echo "Hello world!" > /var/www/html/index.html
+# Create index.html file
+echo "Hello World!" > /var/www/html/index.html
 
-# Start the Nginx service
+# Start Nginx service
 service nginx start
