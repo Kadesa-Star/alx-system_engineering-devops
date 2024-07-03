@@ -1,38 +1,14 @@
 #!/usr/bin/env bash
-# Bash script to install and configure Nginx web server
+# Installs Nginx
 
-# Install Nginx
-if ! apt-get update -y; then
-    echo "Failed to update package lists."
-    exit 1
-fi
+# Update package lists to ensure we install the latest versions
+apt-get update
 
-if ! apt-get install nginx -y; then
-    echo "Failed to install Nginx."
-    exit 1
-fi
+# Install Nginx with the '-y' flag to automatically answer yes to prompts
+apt-get install -y nginx
 
-# Configure Nginx to listen on port 80
-sed -i 's/80 default_server/80/' /etc/nginx/sites-available/default
+# Echo "Holberton School" into /var/www/html/index.html to create a basic index page
+echo "Hello world!" > /var/www/html/index.html
 
-# Restart Nginx without systemctl
-kill -HUP "$(cat /var/run/nginx.pid)"
-
-# Create a test HTML file with "Hello World!"
-echo 'Hello World!' > /var/www/html/index.html
-
-# Check if Nginx is listening on port 80
-nginx_pid=$(cat /var/run/nginx.pid)
-if ! netstat -tuln | grep ":80" | grep -q "$nginx_pid"; then
-    echo "Nginx is not listening on port 80."
-    exit 1
-fi
-
-# Testing Nginx response
-if ! curl -s http://localhost | grep -q "Hello World!"; then
-    echo "Failed to get expected response from Nginx."
-    exit 1
-fi
-
-# If all checks pass, print success message
-echo "Nginx installed and configured successfully."
+# Start the Nginx service
+service nginx start
