@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fix Apache server to return "Hello Holberton" on port 80
 
-# Update package list and install Apache and curl
+# Update package list install Apache and curl
 apt-get update
 apt-get install -y apache2 curl
 
