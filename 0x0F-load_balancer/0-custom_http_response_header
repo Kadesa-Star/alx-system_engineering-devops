@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # This script installs and configures Nginx with a custom HTTP response header on Ubuntu 16.04
-
-# Ignore SC2154 for Shellcheck
 # shellcheck disable=SC2154
 
 # Update package list and install Nginx
