@@ -1,46 +1,17 @@
 #!/usr/bin/env bash
 # Install and configure HAProxy to balance traffic between two web servers
 
-# Update package lists
+# Update the package list
 sudo apt-get update
 
-# Install the latest version of HAProxy
-sudo apt-get -y install haproxy
+# Install a specific version of HAProxy
+sudo apt-get -y install haproxy=1.6.\*
 
 # Enable HAProxy to start on boot
 echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-# Create the HAProxy configuration file with frontend and backend sections
-sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOL
-global
-    log /dev/log local0
-    log /dev/log local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
-    stats timeout 30s
-    user haproxy
-    group haproxy
-    daemon
+# Update the HAProxy configuration to balance traffic between two servers
+sudo sed -i '/^#.*listen stats/,/^$/a \\nlisten http-in\n\tbind *:80\n\tmode http\n\tbalance roundrobin\n\tserver web-01 100.25.202.17:80 check\n\tserver web-02 34.207.62.126:80 check' /etc/haproxy/haproxy.cfg
 
-defaults
-    log     global
-    option  httplog
-    option  dontlognull
-    timeout connect 5000
-    timeout client  50000
-    timeout server  50000
-
-frontend http_front
-    bind *:80
-    mode http
-    default_backend servers
-
-backend servers
-    mode http
-    balance roundrobin
-    server web-01 100.25.202.17:80 check
-    server web-02 34.207.62.126:80 check
-EOL
-
-# Restart the HAProxy service to apply the configuration
+# Start the HAProxy service
 sudo service haproxy restart
