@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# This script installs and configures Nginx with a custom HTTP response header on Ubuntu 16.04
+
+# Ignore SC2154 for Shellcheck
+# shellcheck disable=SC2154
+
+# Update package list and install Nginx
+sudo apt-get update
+sudo apt-get install -y nginx
+
+# Configure Nginx to add a custom HTTP response header
+sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name _;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+        add_header X-Served-By \$hostname;
+    }
+}
+EOL
+
+# Create a simple HTML page
+echo "Welcome to $(hostname)" | sudo tee /var/www/html/index.html
+
+# Restart Nginx to apply the changes
+sudo systemctl restart nginx
