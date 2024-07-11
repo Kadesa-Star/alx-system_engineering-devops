@@ -1,44 +1,44 @@
 #!/usr/bin/env bash
-# This script reports information about server domains
+# script to report information about server domains
 # shellcheck disable=SC2086
 
-# Function to check domain information
 check_domain() {
-    # Space-separated list of subdomains
-    SUBDOMAINS="www lb-01 web-01 web-02"
+    # space separated list of sub domains
+    SUBDOMAINS='www lb-01 web-01 web-02'
 
-    # Exit if no domain is provided
     if [ -z "$1" ]; then
-        exit 1
+        exit
     fi
 
-    # If no subdomain is specified, check all subdomains
+    # no sub domain specified, do all
     if [ -z "$2" ]; then
-        echo "$SUBDOMAINS" | awk -v domain="$1" '
-        BEGIN { RS=" " }
+        echo "$SUBDOMAINS" | awk -v domain="$1" 'BEGIN { RS=" " }
         {
-            cmd = "dig " $1 "." domain " | grep -A1 '\''ANSWER SECTION:'\'' | tail -n1";
-            cmd | getline result;
-            close(cmd);
-            split(result, fields, " ");
-            if (length(fields) >= 5) {
-                print "The subdomain " $1 " is a " fields[4] " record and points to " fields[5];
+            cmd = "dig " $1 "." domain " | grep -A1 \"ANSWER SECTION:\" | tail -n1";
+            if ( (cmd | getline line) > 0 ) {
+                split(line, ARR, /[[:space:]]+/);
+                if (length(ARR) > 4) {
+                    print "The subdomain " $1 " is a " ARR[4] " record and points to " ARR[5];
+                } else {
+                    print "The subdomain " $1 " did not return a valid record.";
+                }
             } else {
                 print "The subdomain " $1 " did not return a valid record.";
             }
+            close(cmd);
         }'
     else
-        dig "$2.$1" | grep -A1 "ANSWER SECTION:" | tail -n1 | awk '
-        {
-            split($0, fields, " ");
-            if (length(fields) >= 5) {
-                print "The subdomain " fields[1] " is a " fields[4] " record and points to " fields[5];
+        dig "$2.$1" | awk '
+        /ANSWER SECTION:/ {
+            getline;
+            split($0, ARR, /[[:space:]]+/);
+            if (length(ARR) > 4) {
+                print "The subdomain " "'$2'" " is a " ARR[4] " record and points to " ARR[5];
             } else {
-                print "The subdomain " fields[1] " did not return a valid record.";
+                print "The subdomain " "'$2'" " did not return a valid record.";
             }
         }'
     fi
 }
 
-# Call the check_domain function with provided arguments
 check_domain "$1" "$2"
