@@ -1,39 +1,31 @@
 #!/usr/bin/env bash
-# Script to display information about subdomains
+# Bash script to display information about specified subdomains
 
-# Check if at least one argument is provided
+# Ensure at least one argument is provided
 if [ $# -lt 1 ]; then
   echo "Usage: $0 domain [subdomain1 subdomain2 ...]"
   exit 1
 fi
 
-# Assign domain name
+# Assign the domain name from the first argument
 domain="$1"
 
-# List of default subdomains to check
+# Default subdomains to query
 subdomains=("www" "lb-01" "web-01" "web-02")
 
-# Append additional subdomains if provided
+# Add additional subdomains from arguments, if any
 if [ $# -gt 1 ]; then
   subdomains+=("${@:2}")
 fi
 
-# Function to check and display DNS record information
-check_subdomain() {
-  local subdomain="$1"
-  local domain="$2"
-  local output
-  output=$(dig "$subdomain.$domain" +short)
+# Iterate through each subdomain and check its IP address
+for subdomain in "${subdomains[@]}"; do
+  ip_address=$(dig "$subdomain.$domain" +short)
   
-  if [ -n "$output" ]; then
-    record_type=$(dig "$subdomain.$domain" | awk '/ANSWER SECTION:/ { getline; print $4 }')
-    echo "The subdomain $subdomain is a $record_type record and points to $output"
+  # Check if IP address is not empty to determine existence
+  if [ -n "$ip_address" ]; then
+    echo "The subdomain $subdomain has IP address $ip_address"
   else
     echo "The subdomain $subdomain does not exist"
   fi
-}
-
-# Loop through subdomains and call function to check each
-for subdomain in "${subdomains[@]}"; do
-  check_subdomain "$subdomain" "$domain"
 done
