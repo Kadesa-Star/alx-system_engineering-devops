@@ -5,10 +5,12 @@
 get_subdomain_info() {
   local domain=$1
   local subdomain=$2
-  local result=$(dig +short "$subdomain.$domain")
+  local result
+  local record_type
 
+  result=$(dig +short "$subdomain.$domain")
   if [[ -n "$result" ]]; then
-    local record_type=$(dig +short "$subdomain.$domain" | grep -Eo 'IN[[:space:]]+[A-Z]+' | awk '{print $2}')
+    record_type=$(dig +short "$subdomain.$domain" | grep -Eo 'IN[[:space:]]+[A-Z]+' | awk '{print $2}')
     echo "The subdomain $subdomain is a $record_type record and points to $result"
   else
     echo "The subdomain $subdomain does not exist."
