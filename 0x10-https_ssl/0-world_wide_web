@@ -1,37 +1,44 @@
 #!/usr/bin/env bash
-# This script audits the DNS records for the specified domain and subdomain
+# This script reports information about server domains
 # shellcheck disable=SC2086
 
-# Function to get subdomain information
-get_subdomain_info() {
-  local domain=$1
-  local subdomain=$2
+# Function to check domain information
+check_domain() {
+    # Space-separated list of subdomains
+    SUBDOMAINS="www lb-01 web-01 web-02"
 
-  local result
-  local record_type
+    # Exit if no domain is provided
+    if [ -z "$1" ]; then
+        exit 1
+    fi
 
-  result=$(dig +short "$subdomain.$domain")
-  if [[ -n "$result" ]]; then
-    record_type=$(dig "$subdomain.$domain" | grep -A1 "ANSWER SECTION:" | tail -n1 | awk '{print $4}')
-    echo "The subdomain $subdomain is a $record_type record and points to $result"
-  else
-    echo "The subdomain $subdomain does not exist."
-  fi
+    # If no subdomain is specified, check all subdomains
+    if [ -z "$2" ]; then
+        echo "$SUBDOMAINS" | awk -v domain="$1" '
+        BEGIN { RS=" " }
+        {
+            cmd = "dig " $1 "." domain " | grep -A1 '\''ANSWER SECTION:'\'' | tail -n1";
+            cmd | getline result;
+            close(cmd);
+            split(result, fields, " ");
+            if (length(fields) >= 5) {
+                print "The subdomain " $1 " is a " fields[4] " record and points to " fields[5];
+            } else {
+                print "The subdomain " $1 " did not return a valid record.";
+            }
+        }'
+    else
+        dig "$2.$1" | grep -A1 "ANSWER SECTION:" | tail -n1 | awk '
+        {
+            split($0, fields, " ");
+            if (length(fields) >= 5) {
+                print "The subdomain " fields[1] " is a " fields[4] " record and points to " fields[5];
+            } else {
+                print "The subdomain " fields[1] " did not return a valid record.";
+            }
+        }'
+    fi
 }
 
-# Main script logic
-if [[ -z "$1" ]]; then
-  echo "Usage: $0 domain [subdomain]"
-  exit 1
-fi
-
-domain=$1
-subdomain=$2
-
-if [[ -n "$subdomain" ]]; then
-  get_subdomain_info "$domain" "$subdomain"
-else
-  for sub in www lb-01 web-01 web-02; do
-    get_subdomain_info "$domain" "$sub"
-  done
-fi
+# Call the check_domain function with provided arguments
+check_domain "$1" "$2"
