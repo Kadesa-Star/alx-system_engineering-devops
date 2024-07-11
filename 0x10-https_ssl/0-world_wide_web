@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Script to display information about server domains
+# Script to report information about server domains
 
-# Function to check domain and subdomains
 check_domain() {
     DOMAIN="$1"
     SUBDOMAIN="$2"
@@ -9,15 +8,36 @@ check_domain() {
     # Default subdomains to check
     SUBDOMAINS='www lb-01 web-01 web-02'
 
+    # Function to check DNS record and print information
+    check_subdomain() {
+        local sub="$1"
+        local dom="$2"
+        local result
+        result=$(dig +short "$sub.$dom")
+
+        if [ -n "$result" ]; then
+            record_type=$(dig +short "$sub.$dom" | awk '/IN/ {print $4}')
+            echo "The subdomain $sub is a $record_type record and points to $result"
+        else
+            echo "The subdomain $sub did not return a valid record."
+        fi
+    }
+
     # If no subdomain specified, check all default subdomains
     if [ -z "$SUBDOMAIN" ]; then
-        for SUB in $SUBDOMAINS; do
-            dig "$SUB.$DOMAIN" | awk '/ANSWER SECTION:/ { getline; print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
+        for sub in $SUBDOMAINS; do
+            check_subdomain "$sub" "$DOMAIN"
         done
     else
-        dig "$SUBDOMAIN.$DOMAIN" | awk '/ANSWER SECTION:/ { getline; print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
+        check_subdomain "$SUBDOMAIN" "$DOMAIN"
     fi
 }
+
+# Check if domain argument is provided
+if [ -z "$1" ]; then
+    echo "Domain name not provided."
+    exit 1
+fi
 
 # Call check_domain function with arguments passed to script
 check_domain "$1" "$2"
