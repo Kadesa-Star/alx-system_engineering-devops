@@ -1,38 +1,23 @@
 #!/usr/bin/env bash
-# Script to report information about server domains
+# Script to display information about server domains
 
+# Function to check domain and subdomains
 check_domain() {
-    # Space-separated list of subdomains
+    DOMAIN="$1"
+    SUBDOMAIN="$2"
+    
+    # Default subdomains to check
     SUBDOMAINS='www lb-01 web-01 web-02'
 
-    if [ -z "$1" ]; then
-        echo "Domain name not provided."
-        exit 1
-    fi
-
-    # Function to check DNS record and print information
-    check_subdomain() {
-        local subdomain="$1"
-        local domain="$2"
-        local result
-        result=$(dig +short "$subdomain.$domain")
-
-        if [ -n "$result" ]; then
-            record_type=$(dig "$subdomain.$domain" | awk '/ANSWER SECTION:/ { getline; print $4 }')
-            echo "The subdomain $subdomain is a $record_type record and points to $result"
-        else
-            echo "The subdomain $subdomain did not return a valid record."
-        fi
-    }
-
-    # If no subdomain specified, check all
-    if [ -z "$2" ]; then
-        for subdomain in $SUBDOMAINS; do
-            check_subdomain "$subdomain" "$1"
+    # If no subdomain specified, check all default subdomains
+    if [ -z "$SUBDOMAIN" ]; then
+        for SUB in $SUBDOMAINS; do
+            dig "$SUB.$DOMAIN" | awk '/ANSWER SECTION:/ { getline; print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
         done
     else
-        check_subdomain "$2" "$1"
+        dig "$SUBDOMAIN.$DOMAIN" | awk '/ANSWER SECTION:/ { getline; print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
     fi
 }
 
+# Call check_domain function with arguments passed to script
 check_domain "$1" "$2"
