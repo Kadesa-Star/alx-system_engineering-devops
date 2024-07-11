@@ -1,35 +1,41 @@
 #!/usr/bin/env bash
 # Script to report information about server domains
-# shellcheck disable=SC2086
 
 check_domain() {
-    SUBDOMAINS='www lb-01 web-01 web-02'
+    local domain="$1"
+    local subdomain="$2"
+    local SUBDOMAINS='www lb-01 web-01 web-02'
 
-    if [ -z "$1" ]; then
-        echo "Domain name not provided."
+    if [ -z "$domain" ]; then
+        echo "Error: Domain name not provided."
         exit 1
     fi
 
+    # Function to check DNS record and print information
     check_subdomain() {
         local sub="$1"
         local dom="$2"
         local result
+
         result=$(dig +short -t A "$sub.$dom")
 
         if [ -n "$result" ]; then
-            echo "The subdomain $sub is a A record and points to $result"
+            record_type=$(dig +short -t A "$sub.$dom" | awk '/ANSWER SECTION:/ { getline; print $4 }')
+            echo "The subdomain $sub is a $record_type record and points to $result"
         else
             echo "The subdomain $sub did not return a valid record."
         fi
     }
 
-    if [ -z "$2" ]; then
+    # If no subdomain specified, check all predefined ones
+    if [ -z "$subdomain" ]; then
         for sub in $SUBDOMAINS; do
-            check_subdomain "$sub" "$1"
+            check_subdomain "$sub" "$domain"
         done
     else
-        check_subdomain "$2" "$1"
+        check_subdomain "$subdomain" "$domain"
     fi
 }
 
+# Validate input and call the main function
 check_domain "$1" "$2"
