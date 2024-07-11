@@ -1,35 +1,40 @@
 #!/usr/bin/env bash
-# This script audits the DNS records for the specified domain and subdomain
+# Script to report information about server domains
 
-# Function to get subdomain information
-get_subdomain_info() {
+# Function to check domain and subdomain information
+check_domain() {
   local domain=$1
   local subdomain=$2
-  local result
-  local record_type
+  local subdomains="www lb-01 web-01 web-02"
 
-  result=$(dig +short "$subdomain.$domain")
-  if [[ -n "$result" ]]; then
-    record_type=$(dig +short "$subdomain.$domain" | grep -Eo 'IN[[:space:]]+[A-Z]+' | awk '{print $2}')
-    echo "The subdomain $subdomain is a $record_type record and points to $result"
+  if [ -z "$domain" ]; then
+    echo "Usage: $0 domain [subdomain]"
+    exit 1
+  fi
+
+  # If no specific subdomain is provided, check all predefined subdomains
+  if [ -z "$subdomain" ]; then
+    echo "$subdomains" | awk -v domain="$domain" \
+    'BEGIN { RS=" " }
+    {
+      cmd = "dig " $0 "." domain " +short"
+      cmd | getline result
+      close(cmd)
+      if (result) {
+        print "The subdomain " $0 " is a A record and points to " result
+      } else {
+        print "The subdomain " $0 " does not exist."
+      }
+    }'
   else
-    echo "The subdomain $subdomain does not exist."
+    dig_result=$(dig +short "$subdomain.$domain")
+    if [ -n "$dig_result" ]; then
+      echo "The subdomain $subdomain is a A record and points to $dig_result"
+    else
+      echo "The subdomain $subdomain does not exist."
+    fi
   fi
 }
 
-# Main script logic
-if [[ -z "$1" ]]; then
-  echo "Usage: $0 domain [subdomain]"
-  exit 1
-fi
-
-domain=$1
-subdomain=$2
-
-if [[ -n "$subdomain" ]]; then
-  get_subdomain_info "$domain" "$subdomain"
-else
-  for sub in www lb-01 web-01 web-02; do
-    get_subdomain_info "$domain" "$sub"
-  done
-fi
+# Call the function with the provided arguments
+check_domain "$1" "$2"
