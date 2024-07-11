@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# A Bash script that displays information about the subdomains
+# Script to display information about subdomains
 
 # Check if at least one argument is provided
 if [ $# -lt 1 ]; then
@@ -7,24 +7,33 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-# Set domain name
+# Assign domain name
 domain="$1"
 
-# Set subdomains to query
+# List of default subdomains to check
 subdomains=("www" "lb-01" "web-01" "web-02")
 
-# If additional subdomains are provided as arguments, add them to the subdomains array
+# Append additional subdomains if provided
 if [ $# -gt 1 ]; then
   subdomains+=("${@:2}")
 fi
 
-# Loop through subdomains and display information
-for subdomain in "${subdomains[@]}"; do
+# Function to check and display DNS record information
+check_subdomain() {
+  local subdomain="$1"
+  local domain="$2"
+  local output
   output=$(dig "$subdomain.$domain" +short)
+  
   if [ -n "$output" ]; then
     record_type=$(dig "$subdomain.$domain" | awk '/ANSWER SECTION:/ { getline; print $4 }')
     echo "The subdomain $subdomain is a $record_type record and points to $output"
   else
     echo "The subdomain $subdomain does not exist"
   fi
+}
+
+# Loop through subdomains and call function to check each
+for subdomain in "${subdomains[@]}"; do
+  check_subdomain "$subdomain" "$domain"
 done
