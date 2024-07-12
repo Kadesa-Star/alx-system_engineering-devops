@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Configures a new Ubuntu machine by installing
+# Configures a new ubuntu machine by installing
 # Nginx where it should be listening on port 80
-# Serves a page that would return a Hello World string
-# Sets up a redirection and a custom 404 page
+# Serve a page that would return a Hello World string
+#
+
 
 echo -e "Updating and installing Nginx.\n"
 sudo apt-get update -y -qq && \
@@ -10,10 +11,10 @@ sudo apt-get update -y -qq && \
 
 echo -e "\nSetting up some minor stuff.\n"
 
-# Starting Nginx service
+# starting nginx service
 sudo service nginx start
 
-# Allowing Nginx on the firewall
+# allowing nginx on firewall
 sudo ufw allow 'Nginx HTTP'
 
 # Give the user ownership to website files for easy editing
@@ -26,21 +27,10 @@ cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.b
 # Creating new index
 echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
 
-# Setting up /redirect_me to a YouTube video
-sudo sed -i '/server {/a\\
-    location /redirect_me {\\
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\\
-    }' /etc/nginx/sites-available/default
+# Setting up /redirect_me to a youtube video
+sudo sed -i '24i\       rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
 
-# Set up a custom 404 page
-echo "Ceci n'est pas une page" > /var/www/html/error_404.html
-sudo sed -i '/server {/a\\
-    error_page 404 /error_404.html;\\
-    location = /error_404.html {\\
-        internal;\\
-    }' /etc/nginx/sites-available/default
-
-# Restarting Nginx
+# Restarting nginx
 sudo service nginx restart
 
 echo -e "\nCompleted.\n"
