@@ -1,32 +1,46 @@
 #!/usr/bin/env bash
-# Configure Nginx to redirect /redirect_me with a 301 status
+# Configures a new Ubuntu machine by installing
+# Nginx where it should be listening on port 80
+# Serves a page that would return a Hello World string
+# Sets up a redirection and a custom 404 page
 
 echo -e "Updating and installing Nginx.\n"
 sudo apt-get update -y -qq && \
-sudo apt-get install nginx -y
+         sudo apt-get install nginx -y
 
-echo -e "\nSetting up Nginx redirection.\n"
+echo -e "\nSetting up some minor stuff.\n"
 
-# Start Nginx service
-sudo systemctl start nginx
+# Starting Nginx service
+sudo service nginx start
 
-# Allow Nginx HTTP traffic in firewall
+# Allowing Nginx on the firewall
 sudo ufw allow 'Nginx HTTP'
 
-# Give ownership of web files to the current user
+# Give the user ownership to website files for easy editing
 sudo chown -R "$USER":"$USER" /var/www/html
-sudo chmod -R 755 /var/www/html
+sudo chmod -R 755 /var/www
 
-# Backup default Nginx configuration
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bckp
+# Backup default index
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
 
-# Configure redirection in Nginx default site configuration
-sudo sed -i '/^.*server_name _;/a \ \ \ \ location /redirect_me {\n \ \ \ \ \ \ \ \ return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n \ \ \ \ }' /etc/nginx/sites-available/default
+# Creating new index
+echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
 
-# Test Nginx configuration for errors
-sudo nginx -t
+# Setting up /redirect_me to a YouTube video
+sudo sed -i '/server {/a\\
+    location /redirect_me {\\
+        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\\
+    }' /etc/nginx/sites-available/default
 
-# Restart Nginx to apply changes
-sudo systemctl restart nginx
+# Set up a custom 404 page
+echo "Ceci n'est pas une page" > /var/www/html/error_404.html
+sudo sed -i '/server {/a\\
+    error_page 404 /error_404.html;\\
+    location = /error_404.html {\\
+        internal;\\
+    }' /etc/nginx/sites-available/default
 
-echo -e "\nNginx redirection configuration completed.\n"
+# Restarting Nginx
+sudo service nginx restart
+
+echo -e "\nCompleted.\n"
