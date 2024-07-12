@@ -5,9 +5,26 @@ apt-get update
 
 # Install Nginx
 apt-get install -y nginx
-sudo chown -R ubuntu /var/www
-# Create index.html file
+
+# Create index.html file with Hello World content
 echo "Hello World!" > /var/www/html/index.html
 
-# Start Nginx service
-service nginx start
+# Configure Nginx to listen on port 80
+cat > /etc/nginx/sites-available/default << EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html;
+
+    server_name _;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+}
+EOF
+
+# Restart Nginx (without systemctl)
+service nginx restart
