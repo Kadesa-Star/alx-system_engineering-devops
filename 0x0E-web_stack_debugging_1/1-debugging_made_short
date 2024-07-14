@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
-# Configures Nginx to listen on port 80 and checks its status
-
-# Check if the symbolic link exists and remove it if it does
-if [ -e /etc/nginx/sites-enabled/default ]; then
-    rm /etc/nginx/sites-enabled/default
-fi
+# Configures an Nginx server to listen on port 80.
 
 # Create a symbolic link from sites-available to sites-enabled
-ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Restart Nginx to apply the changes
-service nginx restart
+# Start the nginx service
+service nginx start
 
-# Check if Nginx is running
-status=$(service nginx status)
-echo "$status" | grep -q "not running" || echo "nginx is not running"
+# Find and kill the oldest nginx process
+kill "$(pgrep 'nginx' | head -n 1)"
