@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
-set -x
 # Fixes server bug
+
+# Set correct permissions for Nginx configuration file
 chmod 644 /etc/nginx/nginx.conf
+
+# Ensure Nginx is set to run as the 'nginx' user
 sed -Ei 's/\s*#?\s*user .*/user nginx;/' /etc/nginx/nginx.conf
+
+# Update the port Nginx listens on to 8080 in the default site configuration
 sed -Ei 's/(listen (\[::\]:)?80) /\180 /' /etc/nginx/sites-enabled/default
+
+# Stop any running Apache service (if present) to avoid conflicts
 pkill apache2
-# restart
+
+# Restart Nginx as the 'nginx' user
 su nginx -s /bin/bash -c 'service nginx restart'
