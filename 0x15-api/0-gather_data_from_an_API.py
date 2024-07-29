@@ -20,7 +20,9 @@ def fetch_employee_data(employee_id):
     """
     # Define API endpoints
     users_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
-    todos_url = f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
+    todos_url = (
+            f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
+            )
 
     # Fetch employee data
     user_response = requests.get(users_url)
@@ -33,11 +35,16 @@ def fetch_employee_data(employee_id):
 
     # Calculate TODO progress
     total_tasks = len(todos_data)
-    completed_tasks = [task['title'] for task in todos_data if task.get('completed')]
+    completed_tasks = (
+            [task['title'] for task in todos_data if task.get('completed')]
+            )
     num_done_tasks = len(completed_tasks)
 
     # output results
-    print(f"Employee {employee_name} is done with tasks({num_done_tasks}/{total_tasks}):")
+    print(
+            f"Employee {employee_name} is done with tasks({num_done_tasks}/"
+            f"{total_tasks}):"
+        )
     for task in completed_tasks:
         print(f"    {task}")
 
