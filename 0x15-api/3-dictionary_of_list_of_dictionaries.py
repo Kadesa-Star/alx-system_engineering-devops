@@ -4,8 +4,8 @@ export data in the json format
 Dictionary of list of dictionaries
 """
 
-import requests
 import json
+import requests
 
 
 def fetch_data():
