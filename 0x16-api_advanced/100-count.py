@@ -3,9 +3,9 @@
 Module for querying Reddit API and counting keyword occurrences in titles.
 """
 
-import requests
-import re
 from collections import defaultdict
+import re
+import requests
 
 
 def count_words(subreddit, word_list, hot_list=None, after=None):
