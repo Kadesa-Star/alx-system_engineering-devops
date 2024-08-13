@@ -5,7 +5,6 @@ for a subreddit.
 """
 
 from requests import get
-import requests
 
 
 def number_of_subscribers(subreddit):
@@ -20,7 +19,7 @@ def number_of_subscribers(subreddit):
     headers = {
         "User-Agent": "Google Chrome Version 127.0.6533.100"
     }
-    req = requests.get(url, headers=headers, allow_redirects=False)
+    req = get(url, headers=headers, allow_redirects=False)
 
     if req.status_code == 200:
         return req.json().get("data", {}).get("subscribers", 0)
