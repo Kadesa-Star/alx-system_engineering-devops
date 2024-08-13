@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-Module querying Reddit API to get no of subscribers for subreddit.
+Module for querying Reddit API to get the number of subscribers
+for a subreddit.
 """
 
 import requests
@@ -8,19 +9,21 @@ import requests
 
 def number_of_subscribers(subreddit):
     """
-    Queries Reddit API to return no of subscribers for a subreddit.
+    Queries the Reddit API to return the number of subscribers for a
+    given subreddit.
 
     Args:
         subreddit (str): The name of the subreddit.
 
     Returns:
-        int: The number of subscribers for the subreddit,
-        or 0 if invalid or error.
+        int: The number of subscribers for the subreddit, or 0 if
+        invalid or error.
     """
     url = 'https://www.reddit.com/r/{}/about.json'.format(subreddit)
     headers = {
-        'User-Agent': 'Mozilla/5.0 (compatible; MyRedditAgent/1.0)'
+        'User-Agent': 'Google Chrome Version 127.0.6533.100'
     }
+
     try:
         response = requests.get(
             url,
