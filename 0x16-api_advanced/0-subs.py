@@ -10,9 +10,8 @@ from requests import get
 def number_of_subscribers(subreddit):
     """
     Function that queries the Reddit API.
-    - If not a valid subreddit, return 0.
+    If not a valid subreddit, return 0.
     """
-
     if not isinstance(subreddit, str) or not subreddit:
         return 0
 
@@ -26,5 +25,4 @@ def number_of_subscribers(subreddit):
 
     if req.status_code == 200:
         return req.json().get("data", {}).get("subscribers", 0)
-    else:
-        return 0
+    return 0
