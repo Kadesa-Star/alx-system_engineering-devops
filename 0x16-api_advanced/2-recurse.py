@@ -22,7 +22,7 @@ def recurse(subreddit, hot_list=[], after=None):
     if not isinstance(subreddit, str) or subreddit == "":
         return None
 
-    user_agent = {'User-Agent': 'Google Chrome Version 81.0.4044.129'}
+    user_agent = {'User-Agent': 'Google Chrome Version 127.0.6533.100'}
 
     url = (
             'https://www.reddit.com/r/{}/hot/.json?after={}'.format(
