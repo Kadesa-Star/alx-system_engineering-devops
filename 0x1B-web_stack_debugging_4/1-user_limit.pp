@@ -1,16 +1,8 @@
-# This Puppet manifest increases the hard and soft file limits for the holberton user
-# to prevent "Too many open files" errors.
+# Change the OS configuration so that it is possible to login with the
+# holberton user and open a file without any error message.
 
-# Increase hard file limit for Holberton user
-exec { 'increase-hard-file-limit-for-holberton-user':
-  command => 'sed -i "/^holberton hard nofile/s/^[0-9]*$/50000/" /etc/security/limits.conf',
-  path    => '/usr/local/bin:/bin',
-  unless  => 'grep -q "^holberton hard nofile 50000" /etc/security/limits.conf',
-}
-
-# Increase soft file limit for Holberton user
-exec { 'increase-soft-file-limit-for-holberton-user':
-  command => 'sed -i "/^holberton soft nofile/s/^[0-9]*$/50000/" /etc/security/limits.conf',
-  path    => '/usr/local/bin:/bin',
-  unless  => 'grep -q "^holberton soft nofile 50000" /etc/security/limits.conf',
+exec {'OS security config':
+  command => 'sed -i "s/^holberton hard nofile.*/holberton hard nofile 50000/" /etc/security/limits.conf && sed -i "s/^holberton soft nofile.*/holberton soft nofile 50000/" /etc/security/limits.conf',
+  path    => '/usr/bin/env/:/bin/:/usr/bin/:/usr/sbin/',
+  unless  => 'grep -q "^holberton hard nofile 50000" /etc/security/limits.conf && grep -q "^holberton soft nofile 50000" /etc/security/limits.conf',
 }
