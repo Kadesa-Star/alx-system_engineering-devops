@@ -1,8 +1,15 @@
-# Change the OS configuration so that it is possible to login with the
-# holberton user and open a file without any error message.
+# Ensure the OS configuration allows the holberton user to login and open files without error.
 
-exec {'OS security config':
-  command => 'sed -i "s/^holberton hard nofile.*/holberton hard nofile 50000/" /etc/security/limits.conf && sed -i "s/^holberton soft nofile.*/holberton soft nofile 50000/" /etc/security/limits.conf',
-  path    => '/usr/bin/env/:/bin/:/usr/bin/:/usr/sbin/',
-  unless  => 'grep -q "^holberton hard nofile 50000" /etc/security/limits.conf && grep -q "^holberton soft nofile 50000" /etc/security/limits.conf',
+# Increase hard file limit for Holberton user.
+exec { 'increase-hard-file-limit-for-holberton-user':
+  command => 'sed -i "/^holberton hard nofile/s/[0-9]*$/50000/" /etc/security/limits.conf',
+  path    => ['/bin', '/usr/bin', '/sbin', '/usr/sbin'],
+  unless  => 'grep -q "^holberton hard nofile 50000" /etc/security/limits.conf',
+}
+
+# Increase soft file limit for Holberton user.
+exec { 'increase-soft-file-limit-for-holberton-user':
+  command => 'sed -i "/^holberton soft nofile/s/[0-9]*$/50000/" /etc/security/limits.conf',
+  path    => ['/bin', '/usr/bin', '/sbin', '/usr/sbin'],
+  unless  => 'grep -q "^holberton soft nofile 50000" /etc/security/limits.conf',
 }
