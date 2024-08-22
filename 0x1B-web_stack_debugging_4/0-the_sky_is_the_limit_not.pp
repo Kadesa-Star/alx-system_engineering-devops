@@ -1,15 +1,15 @@
-# This Puppet manifest increases the amount of traffic an Nginx server can handle.
+# This Puppet manifest adjusts the max open files limit for Nginx and restarts the service.
 
-# Increase the ULIMIT of the default file
-exec { 'increase-nginx-ulimit':
-  command => 'sed -i "s/15/4096/" /etc/default/nginx',
-  path    => ['/usr/local/bin', '/bin'],
-  notify  => Service['nginx'], # Ensure Nginx is restarted if this changes
+# Increase the max open files limit and restart Nginx
+exec { 'modify-max-open-files-limit':
+  command => 'sed -i "s/15/10000/" /etc/default/nginx',
+  path    => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
+  notify  => Service['nginx'],  # Ensure Nginx is restarted if this command changes the configuration
 }
 
-# Restart Nginx
+# Ensure Nginx is running and enabled
 service { 'nginx':
   ensure  => running,
   enable  => true,
-  subscribe => Exec['increase-nginx-ulimit'], # Restart if the file is changed
+  subscribe => Exec['modify-max-open-files-limit'],  # Restart Nginx if the configuration is changed
 }
